@@ -40,7 +40,7 @@ export const EditorView = ({ projectId }: { projectId: Id<"projects"> }) => {
           <div className="size-full flex items-center justify-center">
             <Image
               src="/logo-alt.svg"
-              alt="Polaris"
+              alt="Kyra"
               width={50}
               height={50}
               className="opacity-25"
@@ -63,9 +63,7 @@ export const EditorView = ({ projectId }: { projectId: Id<"projects"> }) => {
             }}
           />
         )}
-        {isActiveFileBinary && (
-          <p>TODO: Implement binary preview</p>
-        )}
+        {isActiveFileBinary && <p>TODO: Implement binary preview</p>}
       </div>
     </div>
   );

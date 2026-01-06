@@ -30,13 +30,9 @@ import { useProject, useRenameProject } from "../hooks/use-projects";
 const font = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-})
+});
 
-export const Navbar = ({
-  projectId
-}: {
-  projectId: Id<"projects">;
-}) => {
+export const Navbar = ({ projectId }: { projectId: Id<"projects"> }) => {
   const project = useProject(projectId);
   const renameProject = useRenameProject(projectId);
 
@@ -73,29 +69,12 @@ export const Navbar = ({
         <Breadcrumb>
           <BreadcrumbList className="gap-0!">
             <BreadcrumbItem>
-              <BreadcrumbLink
-                className="flex items-center gap-1.5"
-                asChild
-              >
-                <Button
-                  variant="ghost"
-                  className="w-fit! p-1.5! h-7!"
-                  asChild
-                >
+              <BreadcrumbLink className="flex items-center gap-1.5" asChild>
+                <Button variant="ghost" className="w-fit! p-1.5! h-7!" asChild>
                   <Link href="/">
-                    <Image
-                      src="/logo.svg"
-                      alt="Logo"
-                      width={20}
-                      height={20}
-                    />
-                    <span
-                      className={cn(
-                        "text-sm font-medium",
-                        font.className,
-                      )}
-                    >
-                      Polaris
+                    <Image src="/logo.svg" alt="Logo" width={20} height={20} />
+                    <span className={cn("text-sm font-medium", font.className)}>
+                      Kyra
                     </span>
                   </Link>
                 </Button>
@@ -139,11 +118,8 @@ export const Navbar = ({
             </TooltipTrigger>
             <TooltipContent>
               Saved{" "}
-              {project?.updatedAt 
-                ? formatDistanceToNow(
-                  project.updatedAt,
-                  { addSuffix: true, }
-                )
+              {project?.updatedAt
+                ? formatDistanceToNow(project.updatedAt, { addSuffix: true })
                 : "Loading..."}
             </TooltipContent>
           </Tooltip>
@@ -153,5 +129,5 @@ export const Navbar = ({
         <UserButton />
       </div>
     </nav>
-  )
+  );
 };
