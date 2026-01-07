@@ -1,9 +1,9 @@
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { useFile } from "@/features/projects/hooks/use-files";
 
 import { useEditor } from "../hooks/use-editor";
-import { Id } from "../../../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 import { FileIcon } from "@react-symbols/icons/utils";
@@ -19,13 +19,8 @@ const Tab = ({
   projectId: Id<"projects">;
 }) => {
   const file = useFile(fileId);
-  const {
-    activeTabId,
-    previewTabId,
-    setActiveTab,
-    openFile,
-    closeTab,
-  } = useEditor(projectId);
+  const { activeTabId, previewTabId, setActiveTab, openFile, closeTab } =
+    useEditor(projectId);
 
   const isActive = activeTabId === fileId;
   const isPreview = previewTabId === fileId;
@@ -47,10 +42,7 @@ const Tab = ({
       ) : (
         <FileIcon fileName={fileName} autoAssign className="size-4" />
       )}
-      <span className={cn(
-        "text-sm whitespace-nowrap",
-        isPreview && "italic"
-      )}>
+      <span className={cn("text-sm whitespace-nowrap", isPreview && "italic")}>
         {fileName}
       </span>
       <button
@@ -77,11 +69,7 @@ const Tab = ({
   );
 };
 
-export const TopNavigation = ({ 
-  projectId
-}: { 
-  projectId: Id<"projects">
-}) => {
+export const TopNavigation = ({ projectId }: { projectId: Id<"projects"> }) => {
   const { openTabs } = useEditor(projectId);
 
   return (

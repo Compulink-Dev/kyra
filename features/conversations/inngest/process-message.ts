@@ -1,8 +1,8 @@
 import { inngest } from "@/inngest/client";
-import { Id } from "../../../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 import { NonRetriableError } from "inngest";
 import { convex } from "@/lib/convex-client";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 
 interface MessageEvent {
   messageId: Id<"messages">;

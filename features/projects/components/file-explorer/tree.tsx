@@ -19,7 +19,7 @@ import { LoadingRow } from "./loading-row";
 import { CreateInput } from "./create-input";
 import { RenameInput } from "./rename-input";
 import { TreeItemWrapper } from "./tree-item-wrapper";
-import { Doc, Id } from "../../../../../convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 export const Tree = ({
   item,
@@ -76,7 +76,7 @@ export const Tree = ({
     }
   };
 
-  const startCreating =(type: "file" | "folder") => {
+  const startCreating = (type: "file" | "folder") => {
     setIsOpen(true);
     setCreating(type);
   };
@@ -107,13 +107,13 @@ export const Tree = ({
         onRename={() => setIsRenaming(true)}
         onDelete={() => {
           closeTab(item._id);
-          deleteFile({ id: item._id })
+          deleteFile({ id: item._id });
         }}
       >
         <FileIcon fileName={fileName} autoAssign className="size-4" />
         <span className="truncate text-sm">{fileName}</span>
       </TreeItemWrapper>
-    )
+    );
   }
 
   const folderName = item.name;
@@ -131,7 +131,7 @@ export const Tree = ({
       </div>
       <span className="truncate text-sm">{folderName}</span>
     </>
-  )
+  );
 
   if (creating) {
     return (
@@ -163,7 +163,7 @@ export const Tree = ({
           </>
         )}
       </>
-    )
+    );
   }
 
   if (isRenaming) {
@@ -191,7 +191,7 @@ export const Tree = ({
           </>
         )}
       </>
-    )
+    );
   }
 
   return (
@@ -202,7 +202,7 @@ export const Tree = ({
         onClick={() => setIsOpen((value) => !value)}
         onRename={() => setIsRenaming(true)}
         onDelete={() => {
-          deleteFile({ id: item._id })
+          deleteFile({ id: item._id });
         }}
         onCreateFile={() => startCreating("file")}
         onCreateFolder={() => startCreating("folder")}
