@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/context-menu";
 
 import { getItemPadding } from "./constants";
-import { Doc } from "../../../../../convex/_generated/dataModel";
+import { Doc } from "@/convex/_generated/dataModel";
 
 export const TreeItemWrapper = ({
   item,
@@ -48,7 +48,7 @@ export const TreeItemWrapper = ({
           }}
           className={cn(
             "group flex items-center gap-1 w-full h-5.5 hover:bg-accent/30 outline-none focus:ring-1 focus:ring-inset focus:ring-ring",
-            isActive && "bg-accent/30",
+            isActive && "bg-accent/30"
           )}
           style={{ paddingLeft: getItemPadding(level, item.type === "file") }}
         >
@@ -61,38 +61,22 @@ export const TreeItemWrapper = ({
       >
         {item.type === "folder" && (
           <>
-            <ContextMenuItem 
-              onClick={onCreateFile}
-              className="text-sm"
-            >
+            <ContextMenuItem onClick={onCreateFile} className="text-sm">
               New File...
             </ContextMenuItem>
-            <ContextMenuItem 
-              onClick={onCreateFolder}
-              className="text-sm"
-            >
+            <ContextMenuItem onClick={onCreateFolder} className="text-sm">
               New Folder...
             </ContextMenuItem>
             <ContextMenuSeparator />
           </>
         )}
-         <ContextMenuItem 
-          onClick={onRename}
-          className="text-sm"
-        >
+        <ContextMenuItem onClick={onRename} className="text-sm">
           Rename...
-          <ContextMenuShortcut>
-            Enter
-          </ContextMenuShortcut>
+          <ContextMenuShortcut>Enter</ContextMenuShortcut>
         </ContextMenuItem>
-         <ContextMenuItem 
-          onClick={onDelete}
-          className="text-sm"
-        >
+        <ContextMenuItem onClick={onDelete} className="text-sm">
           Delete Permanently
-          <ContextMenuShortcut>
-            ⌘Backspace
-          </ContextMenuShortcut>
+          <ContextMenuShortcut>⌘Backspace</ContextMenuShortcut>
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

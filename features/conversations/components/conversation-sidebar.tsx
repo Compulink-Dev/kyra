@@ -33,8 +33,8 @@ import {
   useMessages,
 } from "../hooks/use-conversations";
 
-import { Id } from "../../../../convex/_generated/dataModel";
-import { DEFAULT_CONVERSATION_TITLE } from "../../../../convex/constants";
+import { Id } from "@/convex/_generated/dataModel";
+import { DEFAULT_CONVERSATION_TITLE } from "@/convex/constants";
 
 interface ConversationSidebarProps {
   projectId: Id<"projects">;
@@ -114,14 +114,10 @@ export const ConversationSidebar = ({
           {activeConversation?.title ?? DEFAULT_CONVERSATION_TITLE}
         </div>
         <div className="flex items-center px-1 gap-1">
-          <Button size="icon-xs" variant="highlight">
+          <Button>
             <HistoryIcon className="size-3.5" />
           </Button>
-          <Button
-            size="icon-xs"
-            variant="highlight"
-            onClick={handleCreateConversation}
-          >
+          <Button onClick={handleCreateConversation}>
             <PlusIcon className="size-3.5" />
           </Button>
         </div>

@@ -1,31 +1,30 @@
-import { useState } from "react"
-import { ChevronRightIcon, CopyMinusIcon, FilePlusCornerIcon, FolderPlusIcon } from "lucide-react"
+import { useState } from "react";
+import {
+  ChevronRightIcon,
+  CopyMinusIcon,
+  FilePlusCornerIcon,
+  FolderPlusIcon,
+} from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { useProject } from "../../hooks/use-projects"
-import { Id } from "../../../../../convex/_generated/dataModel"
-import { 
+import { useProject } from "../../hooks/use-projects";
+import { Id } from "@/convex/_generated/dataModel";
+import {
   useCreateFile,
   useCreateFolder,
-  useFolderContents
-} from "../../hooks/use-files"
-import { CreateInput } from "./create-input"
-import { LoadingRow } from "./loading-row"
-import { Tree } from "./tree"
+  useFolderContents,
+} from "../../hooks/use-files";
+import { CreateInput } from "./create-input";
+import { LoadingRow } from "./loading-row";
+import { Tree } from "./tree";
 
-export const FileExplorer = ({ 
-  projectId
-}: { 
-  projectId: Id<"projects">
-}) => {
+export const FileExplorer = ({ projectId }: { projectId: Id<"projects"> }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [collapseKey, setCollapseKey] = useState(0);
-  const [creating, setCreating] = useState<"file" | "folder" | null>(
-    null
-  );
+  const [creating, setCreating] = useState<"file" | "folder" | null>(null);
 
   const project = useProject(projectId);
   const rootFiles = useFolderContents({
@@ -79,8 +78,6 @@ export const FileExplorer = ({
                 setIsOpen(true);
                 setCreating("file");
               }}
-              variant="highlight"
-              size="icon-xs"
             >
               <FilePlusCornerIcon className="size-3.5" />
             </Button>
@@ -91,8 +88,6 @@ export const FileExplorer = ({
                 setIsOpen(true);
                 setCreating("folder");
               }}
-              variant="highlight"
-              size="icon-xs"
             >
               <FolderPlusIcon className="size-3.5" />
             </Button>
@@ -102,8 +97,6 @@ export const FileExplorer = ({
                 e.preventDefault();
                 setCollapseKey((prev) => prev + 1);
               }}
-              variant="highlight"
-              size="icon-xs"
             >
               <CopyMinusIcon className="size-3.5" />
             </Button>
@@ -132,5 +125,5 @@ export const FileExplorer = ({
         )}
       </ScrollArea>
     </div>
-  )
-}
+  );
+};

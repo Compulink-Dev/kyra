@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { EditorView } from "@/features/editor/components/editor-view";
 
 import { FileExplorer } from "./file-explorer";
-import { Id } from "../../../../convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
 
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 800;
@@ -18,7 +18,7 @@ const DEFAULT_MAIN_SIZE = 1000;
 const Tab = ({
   label,
   isActive,
-  onClick
+  onClick,
 }: {
   label: string;
   isActive: boolean;
@@ -37,11 +37,7 @@ const Tab = ({
   );
 };
 
-export const ProjectIdView = ({ 
-  projectId
-}: { 
-  projectId: Id<"projects">
-}) => {
+export const ProjectIdView = ({ projectId }: { projectId: Id<"projects"> }) => {
   const [activeView, setActiveView] = useState<"editor" | "preview">("editor");
 
   return (
@@ -65,10 +61,12 @@ export const ProjectIdView = ({
         </div>
       </nav>
       <div className="flex-1 relative">
-        <div className={cn(
-          "absolute inset-0",
-          activeView === "editor" ? "visible" : "invisible"
-        )}>
+        <div
+          className={cn(
+            "absolute inset-0",
+            activeView === "editor" ? "visible" : "invisible"
+          )}
+        >
           <Allotment defaultSizes={[DEFAULT_SIDEBAR_WIDTH, DEFAULT_MAIN_SIZE]}>
             <Allotment.Pane
               snap
@@ -83,10 +81,12 @@ export const ProjectIdView = ({
             </Allotment.Pane>
           </Allotment>
         </div>
-        <div className={cn(
-          "absolute inset-0",
-          activeView === "preview" ? "visible" : "invisible"
-        )}>
+        <div
+          className={cn(
+            "absolute inset-0",
+            activeView === "preview" ? "visible" : "invisible"
+          )}
+        >
           <div>Preview</div>
         </div>
       </div>
