@@ -69,6 +69,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Image from "next/image";
 
 // ============================================================================
 // Provider Context & Types
@@ -155,6 +156,7 @@ export function PromptInputProvider({
   >([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const openRef = useRef<() => void>(() => {});
+  const attachmentsRef = useRef(attachmentFiles);
 
   const add = useCallback((files: File[] | FileList) => {
     const incoming = Array.from(files);
@@ -196,20 +198,23 @@ export function PromptInputProvider({
     });
   }, []);
 
-  // Keep a ref to attachments for cleanup on unmount (avoids stale closure)
-  const attachmentsRef = useRef(attachmentFiles);
-  attachmentsRef.current = attachmentFiles;
-
   // Cleanup blob URLs on unmount to prevent memory leaks
   useEffect(() => {
+    const currentAttachments = attachmentsRef.current;
+    
     return () => {
-      for (const f of attachmentsRef.current) {
+      for (const f of currentAttachments) {
         if (f.url) {
           URL.revokeObjectURL(f.url);
         }
       }
     };
   }, []);
+
+  // Update ref in effect to avoid React render issues
+  useEffect(() => {
+    attachmentsRef.current = attachmentFiles;
+  }, [attachmentFiles]);
 
   const openFileDialog = useCallback(() => {
     openRef.current?.();
@@ -310,13 +315,20 @@ export function PromptInputAttachment({
           <div className="relative size-5 shrink-0">
             <div className="absolute inset-0 flex size-5 items-center justify-center overflow-hidden rounded bg-background transition-opacity group-hover:opacity-0">
               {isImage ? (
-                <img
-                  alt={filename || "attachment"}
-                  className="size-5 object-cover"
-                  height={20}
-                  src={data.url}
-                  width={20}
-                />
+                data.url ? (
+                  <Image
+                    alt={filename || "attachment"}
+                    className="size-5 object-cover"
+                    height={20}
+                    src={data.url}
+                    width={20}
+                    unoptimized
+                  />
+                ) : (
+                  <div className="flex size-5 items-center justify-center text-muted-foreground">
+                    <ImageIcon className="size-3" />
+                  </div>
+                )
               ) : (
                 <div className="flex size-5 items-center justify-center text-muted-foreground">
                   <PaperclipIcon className="size-3" />
@@ -343,14 +355,15 @@ export function PromptInputAttachment({
       </HoverCardTrigger>
       <PromptInputHoverCardContent className="w-auto p-2">
         <div className="w-auto space-y-3">
-          {isImage && (
+          {isImage && data.url && (
             <div className="flex max-h-96 w-96 items-center justify-center overflow-hidden rounded-md border">
-              <img
+              <Image
                 alt={filename || "attachment preview"}
                 className="max-h-full max-w-full object-contain"
                 height={384}
                 src={data.url}
                 width={448}
+                unoptimized
               />
             </div>
           )}
@@ -479,10 +492,7 @@ export const PromptInput = ({
   // ----- Local attachments (only used when no provider)
   const [items, setItems] = useState<(FileUIPart & { id: string })[]>([]);
   const files = usingProvider ? controller.attachments.files : items;
-
-  // Keep a ref to files for cleanup on unmount (avoids stale closure)
   const filesRef = useRef(files);
-  filesRef.current = files;
 
   const openFileDialogLocal = useCallback(() => {
     inputRef.current?.click();
@@ -599,6 +609,11 @@ export const PromptInput = ({
     controller.__registerFileInput(inputRef, () => inputRef.current?.click());
   }, [usingProvider, controller]);
 
+  // Update filesRef in effect to avoid React render issues
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
   // Note: File input cannot be programmatically set for security reasons
   // The syncHiddenInput prop is no longer functional
   useEffect(() => {
@@ -666,7 +681,6 @@ export const PromptInput = ({
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- cleanup only on unmount; filesRef always current
     [usingProvider]
   );
 
@@ -1060,14 +1074,10 @@ interface SpeechRecognition extends EventTarget {
   lang: string;
   start(): void;
   stop(): void;
-  onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onresult:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any)
-    | null;
-  onerror:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any)
-    | null;
+  onstart: (() => void) | null;
+  onend: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
 }
 
 interface SpeechRecognitionEvent extends Event {
@@ -1128,6 +1138,8 @@ export const PromptInputSpeechButton = ({
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+    
     if (
       typeof window !== "undefined" &&
       ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
@@ -1141,11 +1153,11 @@ export const PromptInputSpeechButton = ({
       speechRecognition.lang = "en-US";
 
       speechRecognition.onstart = () => {
-        setIsListening(true);
+        if (mounted) setIsListening(true);
       };
 
       speechRecognition.onend = () => {
-        setIsListening(false);
+        if (mounted) setIsListening(false);
       };
 
       speechRecognition.onresult = (event) => {
@@ -1172,14 +1184,15 @@ export const PromptInputSpeechButton = ({
 
       speechRecognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
-        setIsListening(false);
+        if (mounted) setIsListening(false);
       };
 
       recognitionRef.current = speechRecognition;
-      setRecognition(speechRecognition);
+      if (mounted) setRecognition(speechRecognition);
     }
 
     return () => {
+      mounted = false;
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
