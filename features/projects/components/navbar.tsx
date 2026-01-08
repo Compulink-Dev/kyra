@@ -3,10 +3,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { CloudCheckIcon, LoaderIcon } from "lucide-react";
+import { 
+  CloudCheck, 
+  Loader2, 
+  Edit2, 
+  Check, 
+  X, 
+  Folder,
+  Save,
+  UploadCloud,
+  AlertCircle
+} from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { Poppins } from "next/font/google";
 import { formatDistanceToNow } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
 
 import {
   Tooltip,
@@ -16,12 +27,12 @@ import {
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 import { Id } from "@/convex/_generated/dataModel";
@@ -34,10 +45,11 @@ const font = Poppins({
 
 export const Navbar = ({ projectId }: { projectId: Id<"projects"> }) => {
   const project = useProject(projectId);
-  const renameProject = useRenameProject(projectId);
+  const renameProject = useRenameProject();
 
   const [isRenaming, setIsRenaming] = useState(false);
   const [name, setName] = useState("");
+  const [isHoveringProject, setIsHoveringProject] = useState(false);
 
   const handleStartRename = () => {
     if (!project) return;
@@ -60,73 +72,249 @@ export const Navbar = ({ projectId }: { projectId: Id<"projects"> }) => {
       handleSubmit();
     } else if (e.key === "Escape") {
       setIsRenaming(false);
+      setName(project?.name || "");
+    }
+  };
+
+  const getStatusIcon = () => {
+    if (!project) return null;
+    
+    switch (project.importStatus) {
+      case "importing":
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <Loader2 className="size-4 text-blue-500 animate-spin" />
+                <span className="text-xs text-blue-500">Importing</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Importing from GitHub...</TooltipContent>
+          </Tooltip>
+        );
+      case "failed":
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <AlertCircle className="size-4 text-destructive" />
+                <span className="text-xs text-destructive">Import Failed</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Failed to import project</TooltipContent>
+          </Tooltip>
+        );
+      default:
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <CloudCheck className="size-4 text-green-500" />
+                <span className="text-xs text-muted-foreground">
+                  Saved{" "}
+                  {project.updatedAt
+                    ? formatDistanceToNow(project.updatedAt, { addSuffix: true })
+                    : "just now"}
+                </span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              Auto-save enabled • Last saved{" "}
+              {project.updatedAt
+                ? formatDistanceToNow(project.updatedAt, { addSuffix: true })
+                : "just now"}
+            </TooltipContent>
+          </Tooltip>
+        );
     }
   };
 
   return (
-    <nav className="flex justify-between items-center gap-x-2 p-2 bg-sidebar border-b">
-      <div className="flex items-center gap-x-2">
-        <Breadcrumb>
-          <BreadcrumbList className="gap-0!">
-            <BreadcrumbItem>
-              <BreadcrumbLink className="flex items-center gap-1.5" asChild>
-                <Button variant="ghost" className="w-fit! p-1.5! h-7!" asChild>
-                  <Link href="/">
-                    <Image src="/logo.svg" alt="Logo" width={20} height={20} />
-                    <span className={cn("text-sm font-medium", font.className)}>
-                      Kyra
-                    </span>
-                  </Link>
-                </Button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="ml-0! mr-1" />
-            <BreadcrumbItem>
-              {isRenaming ? (
-                <input
-                  autoFocus
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onFocus={(e) => e.currentTarget.select()}
-                  onBlur={handleSubmit}
-                  onKeyDown={handleKeyDown}
-                  className="text-sm bg-transparent text-foreground outline-none focus:ring-1 focus:ring-inset focus:ring-ring font-medium max-w-40 truncate"
+    <nav className="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-background via-background to-background/95 backdrop-blur-sm border-b border-border/50 shadow-sm">
+      {/* Left Section - Navigation */}
+      <div className="flex items-center gap-4">
+        {/* Logo & Home */}
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="gap-2 px-3 h-8 rounded-lg hover:bg-accent/30"
+          >
+            <Link href="/">
+              <div className="relative">
+                <Image 
+                  src="/logo.svg" 
+                  alt="Kyra" 
+                  width={100} 
+                  height={100}
+                  className="drop-shadow-sm"
                 />
-              ) : (
-                <BreadcrumbPage
-                  onClick={handleStartRename}
-                  className="text-sm cursor-pointer hover:text-primary font-medium max-w-40 truncate"
-                >
-                  {project?.name ?? "Loading..."}
-                </BreadcrumbPage>
-              )}
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        {project?.importStatus === "importing" ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <LoaderIcon className="size-4 text-muted-foreground animate-spin" />
-            </TooltipTrigger>
-            <TooltipContent>Importing...</TooltipContent>
-          </Tooltip>
-        ) : (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CloudCheckIcon className="size-4 text-muted-foreground" />
-            </TooltipTrigger>
-            <TooltipContent>
-              Saved{" "}
-              {project?.updatedAt
-                ? formatDistanceToNow(project.updatedAt, { addSuffix: true })
-                : "Loading..."}
-            </TooltipContent>
-          </Tooltip>
-        )}
+                <motion.div
+                  className="absolute inset-0 bg-primary/10 rounded-full blur"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              </div>
+            </Link>
+          </Button>
+        </motion.div>
+
+        <Separator orientation="vertical" className="h-6" />
+
+        {/* Project Breadcrumb */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Folder className="size-4 text-primary" />
+            <Breadcrumb>
+              <BreadcrumbList className="flex items-center gap-1">
+                <BreadcrumbItem>
+                  {isRenaming ? (
+                    <motion.div
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="relative"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Input
+                          autoFocus
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          onBlur={handleSubmit}
+                          onKeyDown={handleKeyDown}
+                          className="h-7 w-64 text-sm bg-background border-border/50 focus:border-primary"
+                          placeholder="Project name"
+                        />
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-6"
+                            onClick={handleSubmit}
+                          >
+                            <Check className="size-3.5" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-6"
+                            onClick={() => {
+                              setIsRenaming(false);
+                              setName(project?.name || "");
+                            }}
+                          >
+                            <X className="size-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div
+                      onMouseEnter={() => setIsHoveringProject(true)}
+                      onMouseLeave={() => setIsHoveringProject(false)}
+                      className="relative group"
+                    >
+                      <BreadcrumbPage
+                        onClick={handleStartRename}
+                        className={cn(
+                          "text-sm font-semibold cursor-pointer transition-all",
+                          "px-3 py-1 rounded-lg",
+                          "hover:bg-accent/30 hover:text-primary",
+                          "flex items-center gap-2"
+                        )}
+                      >
+                        {project?.name ?? (
+                          <div className="flex items-center gap-2">
+                            <div className="size-2 rounded-full bg-muted animate-pulse" />
+                            <span className="text-muted-foreground">Loading...</span>
+                          </div>
+                        )}
+                        <AnimatePresence>
+                          {isHoveringProject && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.8 }}
+                            >
+                              <Edit2 className="size-3.5 text-muted-foreground" />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </BreadcrumbPage>
+                    </div>
+                  )}
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+
+          {/* Project Status */}
+          <div className="flex items-center gap-2">
+            {getStatusIcon()}
+          </div>
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        <UserButton />
+
+      {/* Right Section - Actions & User */}
+      <div className="flex items-center gap-3">
+        {/* Quick Actions */}
+        <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 rounded-lg hover:bg-accent/30"
+              >
+                <Save className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Save project (⌘S)</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 rounded-lg hover:bg-accent/30"
+              >
+                <UploadCloud className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Deploy to cloud</TooltipContent>
+          </Tooltip>
+
+          <Separator orientation="vertical" className="h-6" />
+        </div>
+
+        {/* User Area */}
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col items-end">
+            <span className="text-xs text-muted-foreground">Active</span>
+            <div className="flex items-center gap-1.5">
+              <div className="size-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-xs font-medium">
+                {project?.name ? `${project.name.slice(0, 12)}...` : "Project"}
+              </span>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <UserButton 
+              appearance={{
+                elements: {
+                  avatarBox: "size-8 border-2 border-primary/20",
+                }
+              }}
+            />
+            <motion.div
+              className="absolute inset-0 rounded-full bg-primary/10 blur-md"
+              animate={{ opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </div>
+        </div>
       </div>
     </nav>
   );
