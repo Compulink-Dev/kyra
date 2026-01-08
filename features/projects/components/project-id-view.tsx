@@ -20,7 +20,7 @@ import {
   Download,
   Share2
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { EditorView } from "@/features/editor/components/editor-view";
@@ -211,63 +211,56 @@ export const ProjectIdView = ({ projectId }: { projectId: Id<"projects"> }) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 relative overflow-hidden">
-        <AnimatePresence mode="wait">
-          {activeView === "editor" ? (
-            <motion.div
-              key="editor"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0"
+      <div className="flex-1 relative overflow-hidden min-h-0">
+        {activeView === "editor" ? (
+          <div className="h-full w-full">
+            <Allotment 
+              className="h-full w-full"
+              defaultSizes={[sidebarCollapsed ? MIN_SIDEBAR_WIDTH : sidebarWidth, DEFAULT_MAIN_SIZE]}
+              onChange={(sizes) => {
+                if (sizes && sizes[0] > MIN_SIDEBAR_WIDTH) {
+                  setSidebarCollapsed(false);
+                }
+              }}
             >
-              <Allotment 
-                defaultSizes={[sidebarCollapsed ? MIN_SIDEBAR_WIDTH : sidebarWidth, DEFAULT_MAIN_SIZE]}
-                onChange={(sizes) => {
-                  if (sizes[0] > MIN_SIDEBAR_WIDTH) {
-                    setSidebarCollapsed(false);
-                  }
-                }}
+              <Allotment.Pane
+                snap
+                minSize={MIN_SIDEBAR_WIDTH}
+                maxSize={MAX_SIDEBAR_WIDTH}
+                preferredSize={sidebarCollapsed ? MIN_SIDEBAR_WIDTH : sidebarWidth}
+                className="relative overflow-hidden"
               >
-                <Allotment.Pane
-                  snap
-                  minSize={MIN_SIDEBAR_WIDTH}
-                  maxSize={MAX_SIDEBAR_WIDTH}
-                  preferredSize={sidebarCollapsed ? MIN_SIDEBAR_WIDTH : sidebarWidth}
-                  className="relative"
-                >
-                  {/* Sidebar with gradient edge */}
-                  <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-border/50 to-transparent z-10" />
-                  <div className={cn(
-                    "h-full overflow-hidden transition-all duration-300",
-                    sidebarCollapsed 
-                      ? "w-16 bg-sidebar/80 backdrop-blur-sm" 
-                      : "w-full bg-sidebar/95 backdrop-blur-sm"
-                  )}>
-                    <FileExplorer 
-                      projectId={projectId} 
-                      collapsed={sidebarCollapsed}
-                    />
-                  </div>
-                </Allotment.Pane>
-                <Allotment.Pane>
-                  {/* Editor with subtle background gradient */}
-                  <div className="h-full bg-gradient-to-br from-background via-background to-primary/5">
-                    <EditorView projectId={projectId} />
-                  </div>
-                </Allotment.Pane>
-              </Allotment>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="preview"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0"
-            >
+                {/* Sidebar with gradient edge */}
+                <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-border/50 to-transparent z-10 pointer-events-none" />
+                <div className={cn(
+                  "h-full w-full overflow-hidden transition-all duration-300",
+                  sidebarCollapsed 
+                    ? "bg-sidebar/80 backdrop-blur-sm" 
+                    : "bg-sidebar/95 backdrop-blur-sm"
+                )}>
+                  <FileExplorer 
+                    projectId={projectId} 
+                    collapsed={sidebarCollapsed}
+                  />
+                </div>
+              </Allotment.Pane>
+              <Allotment.Pane className="relative overflow-hidden">
+                {/* Editor with subtle background gradient */}
+                <div className="h-full w-full bg-gradient-to-br from-background via-background to-primary/5">
+                  <EditorView projectId={projectId} />
+                </div>
+              </Allotment.Pane>
+            </Allotment>
+          </div>
+        ) : (
+          <motion.div
+            key="preview"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 h-full w-full"
+          >
               {/* Modern Preview View */}
               <div className="h-full flex flex-col">
                 {/* Preview Header */}
@@ -369,8 +362,7 @@ export const ProjectIdView = ({ projectId }: { projectId: Id<"projects"> }) => {
                 </div>
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
+        )}
       </div>
 
       {/* Status Bar */}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronRightIcon } from "lucide-react";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
 import { getItemPadding } from "./constants";
+import { Input } from "@/components/ui/input";
 
 export const CreateInput = ({
   type,
@@ -40,7 +41,7 @@ export const CreateInput = ({
           <FolderIcon className="size-4" folderName={value} />
         )}
       </div>
-      <input
+      <Input
         autoFocus
         type="text"
         value={value}

@@ -73,7 +73,7 @@ export const TreeItemWrapper = ({
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
-        <motion.button
+        <motion.div
           onClick={onClick}
           onDoubleClick={onDoubleClick}
           onKeyDown={(e) => {
@@ -82,12 +82,15 @@ export const TreeItemWrapper = ({
               onRename?.();
             }
           }}
+          role="button"
+          tabIndex={0}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
           className={cn(
             "group relative flex items-center justify-between w-full h-10",
             "rounded-lg px-3 py-2",
             "outline-none transition-all duration-200",
+            "cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20",
             "hover:bg-gradient-to-r hover:from-accent/30 hover:to-accent/10",
             isActive && "bg-gradient-to-r from-primary/20 to-primary/10",
             isActive && "ring-1 ring-primary/20"
@@ -185,7 +188,7 @@ export const TreeItemWrapper = ({
 
           {/* File type indicator */}
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r bg-transparent group-hover:bg-primary/30 transition-colors" />
-        </motion.button>
+        </motion.div>
       </ContextMenuTrigger>
 
       {/* Enhanced Context Menu */}
