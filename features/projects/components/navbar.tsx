@@ -146,8 +146,8 @@ export const Navbar = ({ projectId }: { projectId: Id<"projects"> }) => {
                 <Image 
                   src="/logo.svg" 
                   alt="Kyra" 
-                  width={100} 
-                  height={100}
+                  width={80} 
+                  height={80}
                   className="drop-shadow-sm"
                 />
                 <motion.div
